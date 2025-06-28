@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Weather App</title>
+    
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        font-family: Arial, sans-serif;
+         background: url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1470&q=80') no-repeat center center fixed;
+    background-size: cover;
+        color: white;
+      }
+
+      .card {
+        width: 90%;
+        max-width: 470px;
+        background: rgba(0, 0, 0, 0.6);
+        padding: 30px 20px;
+        margin: 100px auto;
+        border-radius: 20px;
+        text-align: center;
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
+        
+      }
+    <div class="weekly-forecast" style="margin-top: 30px;">
+  <h3>7-Day Forecast</h3>
+  <canvas id="forecastChart" style="max-width: 100%;"></canvas>
+  <table border="1" style="width:100%; margin-top: 20px; background-color: rgba(255,255,255,0.1); color:white;">
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Temp (°C)</th>
+        <th>Weather</th>
+      </tr>
+    </thead>
+    <tbody id="forecastTable"></tbody>
+  </table>
+</div>
+
+      
+
+      .search {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        margin-bottom: 20px;
+      }
+
+      .search input {
+        padding: 10px;
+        border: none;
+        border-radius: 8px;
+        outline: none;
+        flex: 1;
+        max-width: 300px;
+      }
+
+      .search button {
+        background: white;
+        border: none;
+        border-radius: 8px;
+        padding: 10px;
+        cursor: pointer;
+      }
+
+      .search button img {
+        width: 20px;
+      }
+
+      .weather-icon {
+        width: 100px;
+        margin: 20px 0;
+      }
+
+      .details {
+        display: flex;
+        justify-content: space-around;
+        margin-top: 20px;
+      }
+
+      .col {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .col img {
+        width: 30px;
+      }
+
+      .error {
+        color: red;
+        display: none;
+        margin-top: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <div class="search">
+        <input type="text" placeholder="Enter City Name" spellcheck="false" />
+        <button>
+          <img src="https://cdn-icons-png.flaticon.com/512/54/54481.png" alt="search" />
+        </button>
+      </div>
+      <div class="error">
+        <p>Invalid City Name</p>
+      </div>
+      <div class="weather">
+        <img src="https://openweathermap.org/img/wn/10d@2x.png" class="weather-icon" />
+        <h1 class="temp">___</h1>
+        <h2 class="city">Enter the city</h2>
+        <div class="details">
+          <div class="col">
+            <img src="https://cdn-icons-png.flaticon.com/512/728/728093.png" />
+            <div>
+              <p class="humidity">___</p>
+              <p>Humidity</p>
+            </div>
+          </div>
+          <div class="col">
+            <img src="https://cdn-icons-png.flaticon.com/512/481/481153.png" />
+            <div>
+              <p class="wind">___</p>
+              <p>Wind Speed</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const apiKey = "f4e891a0e0f2335bcae9f35320243e43";
+      const apiUrl = "https://api.openweathermap.org/data/2.5/weather?units=metric&q=";
+
+      const searchBox = document.querySelector(".search input");
+      const searchBtn = document.querySelector(".search button");
+      const weatherIcon = document.querySelector(".weather-icon");
+
+      async function checkWeather(city) {
+        const response = await fetch(apiUrl + city + `&appid=${apiKey}`);
+        if (!response.ok) {
+          document.querySelector(".error").style.display = "block";
+          document.querySelector(".weather").style.display = "none";
+          return;
+        }
+
+        const data = await response.json();
+
+        document.querySelector(".city").innerHTML = data.name;
+        document.querySelector(".temp").innerHTML = Math.round(data.main.temp) + "°C";
+        document.querySelector(".humidity").innerHTML = data.main.humidity + "%";
+        document.querySelector(".wind").innerHTML = data.wind.speed + " km/h";
+
+        const condition = data.weather[0].main;
+        if (condition === "Clouds") {
+          weatherIcon.src = "https://openweathermap.org/img/wn/03d@2x.png";
+        } else if (condition === "Clear") {
+          weatherIcon.src = "https://openweathermap.org/img/wn/01d@2x.png";
+        } else if (condition === "Rain") {
+          weatherIcon.src = "https://openweathermap.org/img/wn/09d@2x.png";
+        } else if (condition === "Drizzle") {
+          weatherIcon.src = "https://openweathermap.org/img/wn/10d@2x.png";
+        } else if (condition === "Mist") {
+          weatherIcon.src = "https://openweathermap.org/img/wn/50d@2x.png";
+        } else {
+          weatherIcon.src = "https://openweathermap.org/img/wn/02d@2x.png";
+        }
+
+        document.querySelector(".weather").style.display = "block";
+        document.querySelector(".error").style.display = "none";
+      }
+
+      searchBtn.addEventListener("click", () => {
+        checkWeather(searchBox.value);
+      });
+    </script>
+  </body>
+</html>
